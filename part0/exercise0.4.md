@@ -21,7 +21,7 @@ sequenceDiagram
     deactivate Server
 
     User->>Browser: Write a note and click Save
-    Browser->>Server: POST https://studies.cs.helsinki.fi/exampleapp/notes with data
+    Browser->>Server: POST https://studies.cs.helsinki.fi/exampleapp/notes_new
     activate Server
     Server-->>Browser: Note created successfully
     deactivate Server
