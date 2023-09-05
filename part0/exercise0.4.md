@@ -1,4 +1,4 @@
-## The diagram was made as a GitHub Markdown-file using the Mermaid-syntax:
+## Here's a sequence diagram using Mermaid syntax depicting the scenario where the user creates a new note on the page https://studies.cs.helsinki.fi/exampleapp/notes
 
 ```mermaid
 sequenceDiagram
