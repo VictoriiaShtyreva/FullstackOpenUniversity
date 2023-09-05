@@ -1,4 +1,4 @@
-## here's a Mermaid syntax diagram depicting the scenario where the user goes to the single-page app (SPA) version of the notes app at https://studies.cs.helsinki.fi/exampleapp/spa:
+## Here's a Mermaid syntax diagram depicting the scenario where the user goes to the single-page app (SPA) version of the notes app at https://studies.cs.helsinki.fi/exampleapp/spa:
 
 ```mermaid
 sequenceDiagram
@@ -15,7 +15,7 @@ sequenceDiagram
     activate Server
     Server-->>Browser: CSS file
     deactivate Server
-    Browser->>Server: GET https://studies.cs.helsinki.fi/exampleapp/main.js
+    Browser->>Server: GET https://studies.cs.helsinki.fi/exampleapp/spa.js
     activate Server
     Server-->>Browser: JavaScript file
     deactivate Server
