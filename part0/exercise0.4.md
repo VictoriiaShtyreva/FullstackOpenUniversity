@@ -1,4 +1,4 @@
-The diagram was made as a GitHub Markdown-file using the Mermaid-syntax:
+## The diagram was made as a GitHub Markdown-file using the Mermaid-syntax:
 
 ```mermaid
 sequenceDiagram
@@ -22,4 +22,5 @@ sequenceDiagram
     Server-->>Browser: Updated note data
 
     Browser->>User: Render updated notes on the page
+    
 ```
