@@ -1,4 +1,4 @@
-# Course information
+# Course information 2.5 exercises
 
 ## Usage
 
