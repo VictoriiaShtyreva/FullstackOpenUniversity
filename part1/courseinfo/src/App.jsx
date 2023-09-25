@@ -1,51 +1,56 @@
 import React from "react";
-
-const Header = ({ course }) => {
-  return (
-    <div>
-      <h1>{course}</h1>
-    </div>
-  );
-};
-
-const Part = ({ part, exercises }) => {
-  return (
-    <p>
-      {part} {exercises}
-    </p>
-  );
-};
-
-const Content = ({ parts }) => {
-  return (
-    <>
-      {parts.map((part, index) => (
-        <Part key={index} part={part.part} exercises={part.exercises} />
-      ))}
-    </>
-  );
-};
-
-const Total = ({ parts }) => {
-  const totalExercises = parts.reduce((sum, part) => sum + part.exercises, 0);
-
-  return <h3>total of {totalExercises} exercises</h3>;
-};
+import Course from "./components/Course";
 
 const App = () => {
-  const course = "Half Stack application development";
-  const parts = [
-    { part: "Fundamentals of React", exercises: 10 },
-    { part: "Using props to pass data", exercises: 7 },
-    { part: "State of a component", exercises: 14 },
+  const courses = [
+    {
+      name: "Half Stack application development",
+      id: 1,
+      parts: [
+        {
+          name: "Fundamentals of React",
+          exercises: 10,
+          id: 1,
+        },
+        {
+          name: "Using props to pass data",
+          exercises: 7,
+          id: 2,
+        },
+        {
+          name: "State of a component",
+          exercises: 14,
+          id: 3,
+        },
+        {
+          name: "Redux",
+          exercises: 11,
+          id: 4,
+        },
+      ],
+    },
+    {
+      name: "Node.js",
+      id: 2,
+      parts: [
+        {
+          name: "Routing",
+          exercises: 3,
+          id: 1,
+        },
+        {
+          name: "Middlewares",
+          exercises: 7,
+          id: 2,
+        },
+      ],
+    },
   ];
 
   return (
-    <div>
-      <Header course={course} />
-      <Content parts={parts} />
-      <Total parts={parts} />
-    </div>
+    <>
+      <Course course={courses} />
+    </>
   );
 };
 
