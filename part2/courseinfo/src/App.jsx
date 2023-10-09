@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Note from "./components/Note";
+import noteService from "./services/notes";
 
 const App = () => {
   const [notes, setNotes] = useState([]);
@@ -8,8 +8,8 @@ const App = () => {
   const [showAll, setShowAll] = useState(true);
 
   useEffect(() => {
-    axios.get("http://localhost:3001/notes").then((response) => {
-      setNotes(response.data);
+    noteService.getAll().then((initialNotes) => {
+      setNotes(initialNotes);
     });
   }, []);
 
@@ -20,13 +20,36 @@ const App = () => {
       important: Math.random() < 0.5,
       id: notes.length + 1,
     };
-    setNotes(notes.concat(noteObject));
-    setNewNote("");
+    noteService.create(noteObject).then((reternedNote) => {
+      setNotes(notes.concat(reternedNote));
+      setNewNote("");
+    });
   };
 
   const handleNoteChange = (event) => {
-    console.log(event.target.value);
     setNewNote(event.target.value);
+  };
+
+  const toggleImportanceOf = (id) => {
+    // The first line defines the unique URL for each note resource based on its id.
+    const url = `http://localhost:3001/notes/${id}`;
+    // find the note we want to modify
+    const note = notes.find((note) => note.id === id);
+    // create a new object that is an exact copy of the old note
+    const changedNote = { ...note, important: !note.important };
+
+    noteService
+      .update(id, changedNote)
+      .then((returnedNote) => {
+        setNotes(notes.map((note) => (note.id !== id ? note : returnedNote)));
+      })
+      .catch((error) => {
+        alert(
+          `the note '${note.content}' was already deleted from server`,
+          error
+        );
+        setNotes(notes.filter((n) => n.id !== id));
+      });
   };
 
   const notesToShow = showAll ? notes : notes.filter((note) => note.important);
@@ -41,7 +64,11 @@ const App = () => {
       </div>
       <ul>
         {notesToShow.map((note) => (
-          <Note key={note.id} note={note} />
+          <Note
+            key={note.id}
+            note={note}
+            toggleImportance={() => toggleImportanceOf(note.id)}
+          />
         ))}
       </ul>
       <form onSubmit={addNote}>

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Person from "./components/Person";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
+import personsService from "./services/persons";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -11,10 +11,17 @@ const App = () => {
   const [filterValue, setFilterValue] = useState("");
   const [filteredPersons, setFilteredPersons] = useState(persons);
 
+  // Generate a unique ID for new persons
+  const generateUniqueId = () => {
+    const maxId =
+      persons.length > 0 ? Math.max(...persons.map((person) => person.id)) : 0;
+    return maxId + 1;
+  };
+
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      setPersons(response.data);
-      setFilteredPersons(response.data);
+    personsService.getAll().then((initialPersons) => {
+      setPersons(initialPersons);
+      setFilteredPersons(initialPersons);
     });
   }, []);
 
@@ -43,20 +50,65 @@ const App = () => {
   // Submit form
   const addPerson = (event) => {
     event.preventDefault();
-    const personObject = {
-      name: newName,
-      number: newNumber,
-      id: persons.length + 1,
-    };
-    if (persons.find((person) => person.name === newName)) {
-      alert(newName + " is already added to phonebook");
-      return;
+    const existingPerson = persons.find((person) => person.name === newName);
+
+    if (existingPerson) {
+      if (existingPerson.number === newNumber) {
+        const confirmReplace = window.confirm(
+          `${newName} is already added to the phonebook with the same number. Replace the old number with a new one?`
+        );
+
+        if (!confirmReplace) {
+          // User chose not to replace the number, so we return without updating.
+          return;
+        }
+      }
+
+      const updatedPerson = { ...existingPerson, number: newNumber };
+      personsService
+        .update(existingPerson.id, updatedPerson)
+        .then((returnedPerson) => {
+          setPersons(
+            persons.map((person) =>
+              person.id === returnedPerson.id ? returnedPerson : person
+            )
+          );
+          setNewName("");
+          setNewNumber("");
+          // Update filteredPersons with the updated person
+          setFilteredPersons(
+            filteredPersons.map((person) =>
+              person.id === returnedPerson.id ? returnedPerson : person
+            )
+          );
+        });
+    } else {
+      // Create a new person object with the new name and number
+      const personObject = {
+        name: newName,
+        number: newNumber,
+        id: generateUniqueId(),
+      };
+      personsService.create(personObject).then((returnedNote) => {
+        setPersons(persons.concat(returnedNote));
+        setNewName("");
+        setNewNumber("");
+        // Update filteredPersons with the newly added person
+        setFilteredPersons([...filteredPersons, returnedNote]);
+      });
     }
-    setPersons(persons.concat(personObject));
-    setNewName("");
-    setNewNumber("");
-    // Update filteredPersons with the newly added person
-    setFilteredPersons([...filteredPersons, personObject]);
+  };
+
+  const removePerson = (id) => {
+    const person = persons.find((person) => person.id === id);
+    if (window.confirm(`Delete ${person.name}?`)) {
+      personsService.deletePerson(id).then(() => {
+        setPersons(persons.filter((person) => person.id !== id));
+        setFilteredPersons(
+          filteredPersons.filter((person) => person.id !== id)
+        );
+      });
+    }
   };
 
   return (
@@ -73,8 +125,12 @@ const App = () => {
       />
       <h2>Numbers</h2>
       <ul>
-        {filteredPersons.map((person) => (
-          <Person key={person.id} person={person} />
+        {filteredPersons.map((personItem) => (
+          <Person
+            key={personItem.id}
+            person={personItem}
+            removePerson={removePerson}
+          />
         ))}
       </ul>
     </div>
